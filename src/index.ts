@@ -51,6 +51,18 @@ function authMiddleware(
   next();
 }
 
+app.get("/health", (_req, res) => {
+  const uptimeSeconds = Math.floor((Date.now() - startTime) / 1000);
+  const response: HealthResponse = {
+    status: "ok",
+    agent: "dumb-agent",
+    provider: process.env.LLM_PROVIDER || "deepseek",
+    uptime: uptimeSeconds,
+    langgraph: true,
+  };
+  res.json(response);
+});
+
 app.use(authMiddleware);
 
 app.post("/chat", async (req, res) => {
@@ -126,18 +138,6 @@ app.post("/webhook", async (req, res) => {
     console.error("Webhook error:", (error as Error).message);
     res.status(500).json({ error: "LLM request failed" });
   }
-});
-
-app.get("/health", (_req, res) => {
-  const uptimeSeconds = Math.floor((Date.now() - startTime) / 1000);
-  const response: HealthResponse = {
-    status: "ok",
-    agent: "dumb-agent",
-    provider: process.env.LLM_PROVIDER || "deepseek",
-    uptime: uptimeSeconds,
-    langgraph: true,
-  };
-  res.json(response);
 });
 
 app.listen(PORT, () => {
