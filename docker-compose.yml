@@ -1,0 +1,12 @@
+services:
+  agent:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./memory.md:/app/memory.md
+      - ./soul.md:/app/soul.md
+      - ./identity.md:/app/identity.md
+    restart: unless-stopped
