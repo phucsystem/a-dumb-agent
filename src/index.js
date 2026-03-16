@@ -63,8 +63,8 @@ app.post('/chat', async (req, res) => {
   }
 });
 
-app.post('/webhook', async (req, res) => {
-  const { event, message, conversation } = req.body;
+app.post('/webhook', express.json({ type: '*/*' }), async (req, res) => {
+  const { event, message, conversation } = req.body || {};
 
   if (!message || !message.content) {
     return res.status(400).json({ error: 'message.content is required' });
