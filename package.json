@@ -1,0 +1,26 @@
+{
+  "name": "a-dumb-agent",
+  "version": "1.0.0",
+  "description": "A deliberately simple API agent for testing agentic applications",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phucsystem/a-dumb-agent.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/phucsystem/a-dumb-agent/issues"
+  },
+  "homepage": "https://github.com/phucsystem/a-dumb-agent#readme",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "openai": "^6.29.0"
+  }
+}
