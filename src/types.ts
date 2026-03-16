@@ -1,5 +1,3 @@
-import type { BaseMessage } from "@langchain/core/messages";
-
 export interface ChatRequest {
   message: string;
   sender?: string;

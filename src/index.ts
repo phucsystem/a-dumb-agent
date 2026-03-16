@@ -26,6 +26,7 @@ app.use(express.json());
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const startTime = Date.now();
+const systemPrompt = loadIdentity();
 
 function authMiddleware(
   req: express.Request,
@@ -61,7 +62,6 @@ app.post("/chat", async (req, res) => {
   }
 
   try {
-    const systemPrompt = loadIdentity();
     const reply = await invokeAgent(message, {
       threadId: "default",
       systemPrompt,
@@ -81,7 +81,7 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-app.post("/webhook", express.json({ type: "*/*" }), async (req, res) => {
+app.post("/webhook", async (req, res) => {
   const {
     event,
     message: msg,

@@ -30,24 +30,21 @@ const AgentAnnotation = Annotation.Root({
   }),
 });
 
-function createModel(): ChatOpenAI {
-  return new ChatOpenAI({
-    model: process.env.LLM_MODEL || "deepseek-chat",
-    apiKey: process.env.LLM_API_KEY,
-    configuration: {
-      baseURL: process.env.LLM_BASE_URL || "https://api.deepseek.com/v1",
-    },
-  });
-}
+const model = new ChatOpenAI({
+  model: process.env.LLM_MODEL || "deepseek-chat",
+  apiKey: process.env.LLM_API_KEY,
+  configuration: {
+    baseURL: process.env.LLM_BASE_URL || "https://api.deepseek.com/v1",
+  },
+});
 
 async function agentNode(
   state: typeof AgentAnnotation.State
 ): Promise<Partial<typeof AgentAnnotation.State>> {
-  const model = createModel();
   const store = getStore();
   const senderId = state.sender || "unknown";
 
-  let systemContent = state.systemPrompt || loadIdentity();
+  let systemContent = state.systemPrompt;
 
   const facts = await getUserFacts(store, senderId, 5);
   if (facts.length > 0) {
