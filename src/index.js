@@ -63,6 +63,43 @@ app.post('/chat', async (req, res) => {
   }
 });
 
+app.post('/webhook', async (req, res) => {
+  const { event, message, conversation } = req.body;
+
+  if (!message || !message.content) {
+    return res.status(400).json({ error: 'message.content is required' });
+  }
+
+  if (message.sender_is_agent) {
+    return res.json({ skipped: true, reason: 'ignoring agent messages' });
+  }
+
+  const conversationId = conversation?.id || message?.conversation_id;
+  const senderName = message.sender_name || message.sender_id || 'unknown';
+  const content = message.content;
+
+  try {
+    const systemPrompt = loadIdentity();
+    const history = loadMemory(MAX_MEMORY_ENTRIES, conversationId);
+    const reply = await chat(systemPrompt, history, content);
+    const timestamp = new Date().toISOString();
+
+    appendMemory(senderName, content, reply, conversationId);
+
+    console.log(`[${timestamp}] webhook event=${event} conversation=${conversationId} sender=${senderName} message="${content.substring(0, 80)}"`);
+
+    return res.json({
+      reply,
+      agent: 'dumb-agent',
+      conversation_id: conversationId,
+      timestamp,
+    });
+  } catch (error) {
+    console.error('Webhook error:', error.message);
+    return res.status(500).json({ error: 'LLM request failed' });
+  }
+});
+
 app.get('/health', (req, res) => {
   const uptimeSeconds = Math.floor((Date.now() - startTime) / 1000);
   return res.json({

@@ -1,11 +1,27 @@
 const fs = require('fs');
 const path = require('path');
 
-const MEMORY_PATH = path.resolve(__dirname, '..', 'memory.md');
+const MEMORY_DIR = path.resolve(__dirname, '..', 'memory');
+const LEGACY_MEMORY_PATH = path.resolve(__dirname, '..', 'memory.md');
 
-function loadMemory(maxEntries = 50) {
+function ensureMemoryDir() {
+  if (!fs.existsSync(MEMORY_DIR)) {
+    fs.mkdirSync(MEMORY_DIR, { recursive: true });
+  }
+}
+
+function getMemoryPath(conversationId) {
+  if (!conversationId) return LEGACY_MEMORY_PATH;
+  ensureMemoryDir();
+  const safeId = conversationId.replace(/[^a-zA-Z0-9-]/g, '');
+  return path.join(MEMORY_DIR, `${safeId}.md`);
+}
+
+function loadMemory(maxEntries = 50, conversationId = null) {
+  const memoryPath = getMemoryPath(conversationId);
+
   try {
-    const content = fs.readFileSync(MEMORY_PATH, 'utf-8');
+    const content = fs.readFileSync(memoryPath, 'utf-8');
     if (!content.trim()) return [];
 
     const entries = content
@@ -33,11 +49,12 @@ function loadMemory(maxEntries = 50) {
   }
 }
 
-function appendMemory(sender, message, reply) {
+function appendMemory(sender, message, reply, conversationId = null) {
+  const memoryPath = getMemoryPath(conversationId);
   const timestamp = new Date().toISOString();
   const entry = `## ${timestamp}\n**sender:** ${sender}\n**message:** ${message}\n\n**reply:** ${reply}\n\n---\n\n`;
 
-  fs.appendFileSync(MEMORY_PATH, entry, 'utf-8');
+  fs.appendFileSync(memoryPath, entry, 'utf-8');
 }
 
 module.exports = { loadMemory, appendMemory };
