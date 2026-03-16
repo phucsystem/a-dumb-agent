@@ -6,8 +6,6 @@ services:
     env_file:
       - .env
     volumes:
-      - ./memory.md:/app/memory.md
-      - ./memory:/app/memory
       - ./soul.md:/app/soul.md
       - ./identity.md:/app/identity.md
     restart: unless-stopped
