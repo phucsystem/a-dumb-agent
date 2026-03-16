@@ -1,3 +1,14 @@
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY tsconfig.json ./
+COPY src/ ./src/
+RUN npm run build
+
 FROM node:20-alpine
 
 WORKDIR /app
@@ -5,9 +16,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-COPY src/ ./src/
+COPY --from=build /app/dist/ ./dist/
 COPY soul.md identity.md ./
 
 EXPOSE 3000
 
-CMD ["node", "src/index.js"]
+CMD ["node", "dist/index.js"]
