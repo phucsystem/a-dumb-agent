@@ -54,7 +54,10 @@ async function agentNode(
   }
 
   const systemMessage = new SystemMessage(systemContent);
-  const allMessages: BaseMessage[] = [systemMessage, ...state.messages];
+  // Keep last N messages; round down to even number to preserve human/AI pairs
+  const maxHistory = Math.floor(parseInt(process.env.MAX_MEMORY_ENTRIES || "50", 10) / 2) * 2;
+  const recentMessages = state.messages.slice(-maxHistory);
+  const allMessages: BaseMessage[] = [systemMessage, ...recentMessages];
 
   const modelWithTools =
     tools.length > 0 ? model.bindTools(tools) : model;
